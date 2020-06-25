@@ -1,2 +1,1 @@
-# Shaka
-Various data structures implementation in pure C
+Vanilla C implementations of various data structures
