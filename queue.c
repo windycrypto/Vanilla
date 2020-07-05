@@ -1,17 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct node_ {
-    void *val;
-    struct node_ *next;
-} queue_node_t;
-
-typedef struct queue_ {
-    queue_node_t *head;
-    queue_node_t *tail;
-    int size;
-    void (*free_fn)(void *);
-} queue_t;
+#include "include/queue.h"
 
 queue_t *create_queue(void (*free_fn)(void *)) {
     queue_t *q;
@@ -73,5 +63,3 @@ void *dequeue(queue_t *q) {
 
     return out;
 }
-
-int main() {}

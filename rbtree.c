@@ -1,66 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
- * Print the tree using breadth-first search, this will show tree in the same
- * format with leetcode
- */
-
-/*
- * A very crude queue implementation
- */
-struct rb_node;
-typedef struct queue {
-    struct rb_node *val;
-    struct queue *next;
-} Queue;
-
-void queueCreate(Queue **queue) { *queue = NULL; }
-
-void enqueue(Queue **queue, struct rb_node *c) {
-    Queue *tmp, *p;
-
-    tmp = malloc(sizeof *tmp);
-    tmp->val = c;
-    tmp->next = NULL;
-
-    if (!*queue) {
-        *queue = tmp;
-        return;
-    }
-
-    for (p = *queue; p->next; p = p->next)
-        ;
-
-    p->next = tmp;
-}
-
-void dequeue(Queue **queue, struct rb_node **c) {
-    Queue *tmp;
-
-    if (!*queue) return;
-
-    tmp = *queue;
-    *c = tmp->val;
-    *queue = tmp->next;
-    free(tmp);
-}
-
-int queueEmpty(Queue **queue) { return *queue ? 0 : 1; }
-
-#define RED 0
-#define BLACK 1
-
-#define rb_node_red(n) (n && n->color == RED)
-#define rb_node_black(n) (!rb_node_red(n))
-
-struct rb_node {
-    int val;
-    unsigned int color : 1; // 0: red
-                            // 1: black
-    struct rb_node *left;
-    struct rb_node *right;
-};
+#include "include/rbtree.h"
 
 /*
  * left rotation is also counter clockwise rotation
@@ -406,56 +347,9 @@ struct rb_node *delete (struct rb_node *root, int val) {
     return root;
 }
 
-int maxdepth(struct rb_node *root) {
-    int d1, d2;
+extern void rbtree_dump(struct rb_node *);
 
-    if (!root)
-        return -1;
-    else {
-        d1 = maxdepth(root->left) + 1;
-        d2 = maxdepth(root->right) + 1;
-        return d1 > d2 ? d1 : d2;
-    }
-}
-
-/*
- * print a tree in leetcode format, this method only applies for printing a balanced tree.
- * Printing unbalanced tree may end up with printing excessive "nil"s
- */
-void print(struct rb_node *root) {
-    Queue *queue;
-    int mdepth, fullcount, count;
-    struct rb_node *node;
-
-    queueCreate(&queue);
-
-    mdepth = maxdepth(root);
-    fullcount = (2 << mdepth) - 1;
-
-    count = 0;
-
-    enqueue(&queue, root);
-
-    while (!queueEmpty(&queue)) {
-        dequeue(&queue, &node);
-
-        count++;
-
-        if (!node) {
-            if (count <= fullcount) printf(",nil");
-        } else {
-            if (count > 1) printf(",");
-
-            printf("%d%c", node->val, node->color ? 'b' : 'r');
-
-            enqueue(&queue, node->left);
-            enqueue(&queue, node->right);
-        }
-
-        if (queueEmpty(&queue)) printf("\n");
-    }
-}
-
+// compile with `clang rbtree.c queue.c util.c`
 int main() {
     struct rb_node *root = NULL;
     root = insert(root, 9);
@@ -477,9 +371,9 @@ int main() {
     root = insert(root, 55);
     root = insert(root, 65);
     root = insert(root, 75);
-    print(root);
+    rbtree_dump(root);
 
     root = delete (root, 25);
-    print(root);
+    rbtree_dump(root);
 }
 
