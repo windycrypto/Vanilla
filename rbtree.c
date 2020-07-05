@@ -289,7 +289,11 @@ struct rb_node *delete (struct rb_node *root, int val) {
                     GP->left = nr;
                 else
                     GP->right = nr;
-            } else { // either n is red or not, continue going down
+            } else if (rb_node_red(n)) { // n is red
+                goto next;
+            } else if (P == root) { // both s and n is black
+                P->color = RED;
+            } else {
                 goto next;
             }
         }
@@ -348,10 +352,10 @@ struct rb_node *delete (struct rb_node *root, int val) {
                 else
                     GP->right = nr;
             }
-            // if (P == root) n->color = BLACK; // need to color root back
         }
 
     next:
+        if (P == root) P->color = BLACK; // need to color root back
 
         if (n->val > val) {
             GP = P, P = n;
@@ -475,7 +479,7 @@ int main() {
     root = insert(root, 75);
     print(root);
 
-    root = delete (root, 31);
+    root = delete (root, 25);
     print(root);
 }
 
