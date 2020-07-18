@@ -48,4 +48,3 @@ void rbtree_dump(struct rb_node *root) {
         if (queue->size < 1) printf("\n");
     }
 }
-
