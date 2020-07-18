@@ -4,6 +4,9 @@
 
 #include "include/skip-list.h"
 
+/* An implementation of the 
+ * "Skip Lists: A Probabilistic Alternative to Balanced Trees" written by William Pugh */
+
 static inline struct skip_list_node *skip_list_new_node(int key) {
     struct skip_list_node *new;
     new = calloc(1, sizeof *new);
@@ -128,6 +131,15 @@ int main() {
     insert(list, 16);
     insert(list, 160);
     insert(list, 130);
-    //delete(list, 16);
+    insert(list, 135);
+    insert(list, 230);
+    insert(list, 530);
+    insert(list, 234);
+    insert(list, 720);
+    insert(list, 150);
+    insert(list, 190);
+    insert(list, 133);
+    insert(list, 30);
+    delete(list, 135);
     skip_list_dump(list);
 }
