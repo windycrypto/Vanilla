@@ -11,43 +11,51 @@
  */
 struct rb_node;
 typedef struct queue {
-  struct rb_node *val;
-  struct queue *next;
+	struct rb_node *val;
+	struct queue *next;
 } Queue;
 
-void queueCreate(Queue **queue) { *queue = NULL; }
-
-void enqueue(Queue **queue, struct rb_node *c) {
-  Queue *tmp, *p;
-
-  tmp = malloc(sizeof *tmp);
-  tmp->val = c;
-  tmp->next = NULL;
-
-  if (!*queue) {
-    *queue = tmp;
-    return;
-  }
-
-  for (p = *queue; p->next; p = p->next)
-    ;
-
-  p->next = tmp;
+void queueCreate(Queue **queue)
+{
+	*queue = NULL;
 }
 
-void dequeue(Queue **queue, struct rb_node **c) {
-  Queue *tmp;
+void enqueue(Queue **queue, struct rb_node *c)
+{
+	Queue *tmp, *p;
 
-  if (!*queue)
-    return;
+	tmp = malloc(sizeof *tmp);
+	tmp->val = c;
+	tmp->next = NULL;
 
-  tmp = *queue;
-  *c = tmp->val;
-  *queue = tmp->next;
-  free(tmp);
+	if (!*queue) {
+		*queue = tmp;
+		return;
+	}
+
+	for (p = *queue; p->next; p = p->next)
+		;
+
+	p->next = tmp;
 }
 
-int queueEmpty(Queue **queue) { return *queue ? 0 : 1; }
+void dequeue(Queue **queue, struct rb_node **c)
+{
+	Queue *tmp;
+
+	if (!*queue)
+		return;
+
+	tmp = *queue;
+	*c = tmp->val;
+	*queue = tmp->next;
+	free(tmp);
+}
+
+int queueEmpty(Queue **queue)
+{
+	return *queue ? 0 : 1;
+}
 
 #define RED 0
 #define BLACK 1
@@ -57,12 +65,12 @@ int queueEmpty(Queue **queue) { return *queue ? 0 : 1; }
 #define rb_parent(n) (n->parent)
 
 struct rb_node {
-  int val;
-  int color; // 0: red
-             // 1: black
-  struct rb_node *parent;
-  struct rb_node *left;
-  struct rb_node *right;
+	int val;
+	int color; // 0: red
+		// 1: black
+	struct rb_node *parent;
+	struct rb_node *left;
+	struct rb_node *right;
 };
 
 /*
@@ -70,72 +78,74 @@ struct rb_node {
  *
  * \return new root
  */
-struct rb_node *rotate(struct rb_node *n, int dir) {
-  struct rb_node *tmp;
+struct rb_node *rotate(struct rb_node *n, int dir)
+{
+	struct rb_node *tmp;
 
-  /* dir != 0, clockwise */
-  if (dir) {
-    tmp = n->left;
-    n->left = tmp->right;
-    tmp->right = n;
-  } else {
-    tmp = n->right;
-    n->right = tmp->left;
-    tmp->left = n;
-  }
+	/* dir != 0, clockwise */
+	if (dir) {
+		tmp = n->left;
+		n->left = tmp->right;
+		tmp->right = n;
+	} else {
+		tmp = n->right;
+		n->right = tmp->left;
+		tmp->left = n;
+	}
 
-  return tmp;
+	return tmp;
 }
 
 /*
  * \return a new root
  */
-struct rb_node *insert(struct rb_node *root, int val) {
-  // inserting into an empty rbtree
-  if (!root) {
-    root = calloc(1, sizeof *root);
-    root->parent = NULL;
-    root->left = root->right = NULL;
-    root->color = BLACK;
-    root->val = val;
-    return root;
-  }
+struct rb_node *insert(struct rb_node *root, int val)
+{
+	// inserting into an empty rbtree
+	if (!root) {
+		root = calloc(1, sizeof *root);
+		root->parent = NULL;
+		root->left = root->right = NULL;
+		root->color = BLACK;
+		root->val = val;
+		return root;
+	}
 
-  // go down to find the inserting point
-  struct rb_node *nn = root, *parent = NULL, *gparent = NULL, *ggparent = NULL,
-                 *gggparent = NULL;
-  while (nn) {
-    gggparent = ggparent;
-    ggparent = gparent;
-    gparent = parent;
-    parent = nn;
+	// go down to find the inserting point
+	struct rb_node *nn = root, *parent = NULL, *gparent = NULL,
+		       *ggparent = NULL, *gggparent = NULL;
+	while (nn) {
+		gggparent = ggparent;
+		ggparent = gparent;
+		gparent = parent;
+		parent = nn;
 
-    // if the inserting value already exists, skip
-    if (nn->val == val)
-      return root;
-    else if (nn->val > val)
-      nn = nn->left;
-    else
-      nn = nn->right;
-  }
+		// if the inserting value already exists, skip
+		if (nn->val == val)
+			return root;
+		else if (nn->val > val)
+			nn = nn->left;
+		else
+			nn = nn->right;
+	}
 
-  // allocate the new rb node
-  nn = calloc(1, sizeof *root);
-  nn->left = nn->right = NULL;
-  nn->color = RED;
-  nn->val = val;
+	// allocate the new rb node
+	nn = calloc(1, sizeof *root);
+	nn->left = nn->right = NULL;
+	nn->color = RED;
+	nn->val = val;
 
-  // if parent is black, we are done
-  if (!rb_is_red(parent)) {
-    if (parent->val > val) {
-      parent->left = nn;
-    } else {
-      parent->right = nn;
-    }
-    return root;
-  }
+	// if parent is black, we are done
+	if (!rb_is_red(parent)) {
+		if (parent->val > val) {
+			parent->left = nn;
+		} else {
+			parent->right = nn;
+		}
+		return root;
+	}
 
-  /*
+	/*
    * ([Remove me]: all tested)
    *
    * Case 1 - inserting node's uncle doesn't exist
@@ -149,17 +159,15 @@ struct rb_node *insert(struct rb_node *root, int val) {
    * rotate on parent or grandparent and do color flips accordingly, note that
    * when falls in this case G must be black and P must be red
    */
-  if (!gparent->left || !gparent->right) {
+	if (!gparent->left || !gparent->right) {
+		struct rb_node *
+			nr; // represents the new root of the subtree after rotation
+		if (!gparent->left) {
+			if (parent->val < val) {
+				// bind the new node with current parent temporarily
+				parent->right = nn;
 
-    struct rb_node *nr; // represents the new root of the subtree after rotation
-    if (!gparent->left) {
-
-      if (parent->val < val) {
-
-        // bind the new node with current parent temporarily
-        parent->right = nn;
-
-        /*
+				/*
          * Case 1.1
          *
          * G(b)                P(r)                           P(b)
@@ -168,16 +176,15 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *    \
          *    new(r)
          */
-        nr = rotate(gparent, 0);
+				nr = rotate(gparent, 0);
 
-        nr->color = BLACK;
-        gparent->color = RED;
-      } else {
+				nr->color = BLACK;
+				gparent->color = RED;
+			} else {
+				// bind the new node with current parent temporarily
+				parent->left = nn;
 
-        // bind the new node with current parent temporarily
-        parent->left = nn;
-
-        /*
+				/*
          * Case 1.2
          *
          *  G(b)          G(b)           n(r)                  n(b)
@@ -187,21 +194,19 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *   n(r)              P(r)
          */
 
-        gparent->right = rotate(parent, 1);
-        nr = rotate(gparent, 0);
+				gparent->right = rotate(parent, 1);
+				nr = rotate(gparent, 0);
 
-        nr->color = BLACK;
-        gparent->color = RED;
-      }
+				nr->color = BLACK;
+				gparent->color = RED;
+			}
 
-    } else {
+		} else {
+			if (parent->val > val) {
+				// bind the new node with current parent temporarily
+				parent->left = nn;
 
-      if (parent->val > val) {
-
-        // bind the new node with current parent temporarily
-        parent->left = nn;
-
-        /*
+				/*
          * Case 1.3
          *
          *     G(b)           P(r)                            P(b)
@@ -210,17 +215,16 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *   /
          *  n(r)
          */
-        nr = rotate(gparent, 1);
+				nr = rotate(gparent, 1);
 
-        nr->color = BLACK;
-        gparent->color = RED;
+				nr->color = BLACK;
+				gparent->color = RED;
 
-      } else {
+			} else {
+				// bind the new node with current parent temporarily
+				parent->right = nn;
 
-        // bind the new node with current parent temporarily
-        parent->right = nn;
-
-        /*
+				/*
          * Case 1.4
          *
          *   G(b)         G(b)       n(r)                   n(b)
@@ -230,26 +234,26 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *   n(r)       P(r)
          */
 
-        gparent->left = rotate(parent, 0);
-        nr = rotate(gparent, 1);
+				gparent->left = rotate(parent, 0);
+				nr = rotate(gparent, 1);
 
-        nr->color = BLACK;
-        gparent->color = RED;
-      }
-    }
+				nr->color = BLACK;
+				gparent->color = RED;
+			}
+		}
 
-    if (!ggparent) { // ggparent is NULL means gparent is root
-      root = nr;
-    } else if (ggparent->left == gparent) {
-      ggparent->left = nr;
-    } else if (ggparent->right == gparent) {
-      ggparent->right = nr;
-    }
+		if (!ggparent) { // ggparent is NULL means gparent is root
+			root = nr;
+		} else if (ggparent->left == gparent) {
+			ggparent->left = nr;
+		} else if (ggparent->right == gparent) {
+			ggparent->right = nr;
+		}
 
-    return root;
-  }
+		return root;
+	}
 
-  /*
+	/*
    * Case 2 - inserting node's uncle is red
    *
    *      G(b)            G(b)              G(b)                G(b)
@@ -263,13 +267,14 @@ struct rb_node *insert(struct rb_node *root, int val) {
    *
    * U cannot be black or it breaks the red-black tree's constraints
    */
-  if (gparent->left == parent) {
-    struct rb_node *nr; // represents the new root of the subtree after rotation
-    if (parent->val > val) {
-      // bind the new node with current parent temporarily
-      parent->left = nn;
+	if (gparent->left == parent) {
+		struct rb_node *
+			nr; // represents the new root of the subtree after rotation
+		if (parent->val > val) {
+			// bind the new node with current parent temporarily
+			parent->left = nn;
 
-      /*
+			/*
        * Case 2.1
        *
        *      G(b)              G(r)
@@ -279,12 +284,12 @@ struct rb_node *insert(struct rb_node *root, int val) {
        *   n(r)               n(r)
        */
 
-      gparent->color = RED;
-      parent->color = BLACK;
-      gparent->right->color = BLACK;
+			gparent->color = RED;
+			parent->color = BLACK;
+			gparent->right->color = BLACK;
 
-      if (!ggparent) { // gparent(G) is the root node
-        /*
+			if (!ggparent) { // gparent(G) is the root node
+				/*
          * Case 2.1.1
          *
          *      G(r)              G(b)
@@ -293,10 +298,10 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *    /                  /
          *   n(r)               n(r)
          */
-        gparent->color = BLACK;
-      } else if (!rb_is_red(ggparent)) {
-        // ggparent is black, do nothing
-        /*
+				gparent->color = BLACK;
+			} else if (!rb_is_red(ggparent)) {
+				// ggparent is black, do nothing
+				/*
          * Case 2.1.2
          *
          *        GGP(b)
@@ -310,11 +315,11 @@ struct rb_node *insert(struct rb_node *root, int val) {
          * here GGP(grand grand parent)'s right substree must have a
          * black node
          */
-      } else { // ggparent is red
+			} else { // ggparent is red
 
-        if (ggparent->left == gparent) {
-          printf("hit\n");
-          /*
+				if (ggparent->left == gparent) {
+					printf("hit\n");
+					/*
            * Case 2.1.3.1
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -331,19 +336,21 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *
            */
 
-          nr = rotate(ggparent, 1);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 1);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
-        } else {
-          /*
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
+				} else {
+					/*
            * Case 2.1.3.2
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -360,25 +367,27 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *
            */
 
-          nr = rotate(ggparent, 0);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 0);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
-        }
-      }
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
+				}
+			}
 
-    } else {
-      // bind the new node with current parent temporarily
-      parent->right = nn;
+		} else {
+			// bind the new node with current parent temporarily
+			parent->right = nn;
 
-      /*
+			/*
        * Case 2.2
        *
        *      G(b)               G(b)                  G(r)
@@ -388,7 +397,7 @@ struct rb_node *insert(struct rb_node *root, int val) {
        *      n(r)             P(r)                P(r)
        */
 
-      /*
+			/*
       fprintf(stdout,
               "gparent: %p, gparent->left: %p, ggparent: %p, ggparent->val: "
               "%d, ggparent->color: %d, parent: %p, "
@@ -396,15 +405,15 @@ struct rb_node *insert(struct rb_node *root, int val) {
               gparent, gparent->left, ggparent, ggparent->val, ggparent->color,
               parent, parent->right, nn);
               */
-      nr = rotate(parent, 0);
-      gparent->left = nr;
+			nr = rotate(parent, 0);
+			gparent->left = nr;
 
-      gparent->color = RED;
-      nr->color = BLACK;
-      gparent->right->color = BLACK;
+			gparent->color = RED;
+			nr->color = BLACK;
+			gparent->right->color = BLACK;
 
-      if (!ggparent) { // gparent(G) is the root node
-        /*
+			if (!ggparent) { // gparent(G) is the root node
+				/*
          * Case 2.2.1
          *
          *      G(r)              G(b)
@@ -413,10 +422,10 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *    /                  /
          *   P(r)               P(r)
          */
-        gparent->color = BLACK;
-      } else if (!rb_is_red(ggparent)) {
-        // ggparent is black, do nothing
-        /*
+				gparent->color = BLACK;
+			} else if (!rb_is_red(ggparent)) {
+				// ggparent is black, do nothing
+				/*
          * Case 2.2.2
          *
          *        GGP(b)
@@ -430,9 +439,9 @@ struct rb_node *insert(struct rb_node *root, int val) {
          * here GGP(grand grand parent)'s right substree must have a
          * black node
          */
-      } else { // ggparent is red
-        if (ggparent->left == gparent) {
-          /*
+			} else { // ggparent is red
+				if (ggparent->left == gparent) {
+					/*
            * Case 2.2.3.1
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -449,21 +458,24 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *
            */
 
-          struct rb_node *gggparent = rb_parent(ggparent);
+					struct rb_node *gggparent =
+						rb_parent(ggparent);
 
-          nr = rotate(ggparent, 1);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 1);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
-        } else {
-          /*
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
+				} else {
+					/*
            * Case 2.2.3.2
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -479,29 +491,33 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *   P(r)                      P(r)                  P(r)
            *
            */
-          struct rb_node *gggparent = rb_parent(ggparent);
+					struct rb_node *gggparent =
+						rb_parent(ggparent);
 
-          nr = rotate(ggparent, 0);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 0);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
-        }
-      }
-    }
-  } else {
-    struct rb_node *nr; // represents the new root of the subtree after rotation
-    if (parent->val > val) {
-      // bind the new node with current parent temporarily
-      parent->left = nn;
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
+				}
+			}
+		}
+	} else {
+		struct rb_node *
+			nr; // represents the new root of the subtree after rotation
+		if (parent->val > val) {
+			// bind the new node with current parent temporarily
+			parent->left = nn;
 
-      /*
+			/*
        * Case 2.3
        *
        *    G(b)                   G(r)
@@ -510,12 +526,12 @@ struct rb_node *insert(struct rb_node *root, int val) {
        *          \                      \
        *          n(r)                   n(r)
        */
-      gparent->color = RED;
-      parent->color = BLACK;
-      gparent->right->color = BLACK;
+			gparent->color = RED;
+			parent->color = BLACK;
+			gparent->right->color = BLACK;
 
-      if (!ggparent) { // gparent(G) is the root node
-        /*
+			if (!ggparent) { // gparent(G) is the root node
+				/*
          * Case 2.3.1
          *
          *      G(r)              G(b)
@@ -524,10 +540,10 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *           \                  \
          *           n(r)               n(r)
          */
-        gparent->color = BLACK;
-      } else if (!rb_is_red(ggparent)) {
-        // ggparent is black, do nothing
-        /*
+				gparent->color = BLACK;
+			} else if (!rb_is_red(ggparent)) {
+				// ggparent is black, do nothing
+				/*
          * Case 2.3.2
          *
          *        GGP(b)
@@ -541,9 +557,9 @@ struct rb_node *insert(struct rb_node *root, int val) {
          * here GGP(grand grand parent)'s right substree must have a
          * black node
          */
-      } else { // ggparent is red
-        if (ggparent->left == gparent) {
-          /*
+			} else { // ggparent is red
+				if (ggparent->left == gparent) {
+					/*
            * Case 2.3.3.1
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -560,21 +576,24 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *
            */
 
-          struct rb_node *gggparent = rb_parent(ggparent);
+					struct rb_node *gggparent =
+						rb_parent(ggparent);
 
-          nr = rotate(ggparent, 1);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 1);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
-        } else {
-          /*
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
+				} else {
+					/*
            * Case 2.3.3.2
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -590,26 +609,29 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *         n(r)
            *
            */
-          struct rb_node *gggparent = rb_parent(ggparent);
+					struct rb_node *gggparent =
+						rb_parent(ggparent);
 
-          nr = rotate(ggparent, 0);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 0);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
-        }
-      }
-    } else {
-      // bind the new node with current parent temporarily
-      parent->right = nn;
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
+				}
+			}
+		} else {
+			// bind the new node with current parent temporarily
+			parent->right = nn;
 
-      /*
+			/*
        * Case 2.4
        *
        *      G(b)                G(r)
@@ -619,12 +641,12 @@ struct rb_node *insert(struct rb_node *root, int val) {
        *           n(r)                  n(r)
        */
 
-      gparent->color = RED;
-      parent->color = BLACK;
-      gparent->right->color = BLACK;
+			gparent->color = RED;
+			parent->color = BLACK;
+			gparent->right->color = BLACK;
 
-      if (!ggparent) { // gparent(G) is the root node
-        /*
+			if (!ggparent) { // gparent(G) is the root node
+				/*
          * Case 2.4.1
          *
          *      G(b)                G(b)
@@ -633,10 +655,10 @@ struct rb_node *insert(struct rb_node *root, int val) {
          *           \                    \
          *           n(r)                  n(r)
          */
-        gparent->color = BLACK;
-      } else if (!rb_is_red(ggparent)) {
-        // ggparent is black, do nothing
-        /*
+				gparent->color = BLACK;
+			} else if (!rb_is_red(ggparent)) {
+				// ggparent is black, do nothing
+				/*
          * Case 2.4.2
          *
          *        GGP(b)
@@ -650,10 +672,10 @@ struct rb_node *insert(struct rb_node *root, int val) {
          * here GGP(grand grand parent)'s left substree must have a
          * black node
          */
-      } else { // ggparent is red
+			} else { // ggparent is red
 
-        if (ggparent->left == gparent) {
-          /*
+				if (ggparent->left == gparent) {
+					/*
            * Case 2.4.3.1
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -669,22 +691,25 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *         n(r)             n(r)                 n(r)
            *
            */
-          struct rb_node *gggparent = rb_parent(ggparent);
+					struct rb_node *gggparent =
+						rb_parent(ggparent);
 
-          nr = rotate(ggparent, 1);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 1);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
 
-        } else {
-          /*
+				} else {
+					/*
            * Case 2.4.3.2
            *
            * here GGP(grand grand parent)'s right substree(α) must have
@@ -701,36 +726,40 @@ struct rb_node *insert(struct rb_node *root, int val) {
            *
            */
 
-          struct rb_node *gggparent = rb_parent(ggparent);
+					struct rb_node *gggparent =
+						rb_parent(ggparent);
 
-          nr = rotate(ggparent, 0);
-          nr->color = BLACK;
+					nr = rotate(ggparent, 0);
+					nr->color = BLACK;
 
-          if (!gggparent) {
-            // ggparent is NULL means gparent is root
-            root = nr;
-          } else if (gggparent->left == ggparent) {
-            gggparent->left = nr;
-          } else if (gggparent->right == ggparent) {
-            gggparent->right = nr;
-          }
-        }
-      }
-    }
-  }
+					if (!gggparent) {
+						// ggparent is NULL means gparent is root
+						root = nr;
+					} else if (gggparent->left ==
+						   ggparent) {
+						gggparent->left = nr;
+					} else if (gggparent->right ==
+						   ggparent) {
+						gggparent->right = nr;
+					}
+				}
+			}
+		}
+	}
 
-  return root;
+	return root;
 }
 
-struct rb_node *find(struct rb_node *root, int val) {
-  if (!root)
-    return NULL;
-  else if (root->val > val)
-    return find(root->left, val);
-  else if (root->val < val)
-    return find(root->right, val);
-  else
-    return root;
+struct rb_node *find(struct rb_node *root, int val)
+{
+	if (!root)
+		return NULL;
+	else if (root->val > val)
+		return find(root->left, val);
+	else if (root->val < val)
+		return find(root->right, val);
+	else
+		return root;
 }
 
 #if 0
@@ -784,72 +813,75 @@ struct RBTreeNode *remove(struct RBTreeNode *root, int val) {
   return root;
 }
 #endif
-int maxdepth(struct rb_node *root) {
-  int d1, d2;
+int maxdepth(struct rb_node *root)
+{
+	int d1, d2;
 
-  if (!root)
-    return -1;
-  else {
-    d1 = maxdepth(root->left) + 1;
-    d2 = maxdepth(root->right) + 1;
-    return d1 > d2 ? d1 : d2;
-  }
+	if (!root)
+		return -1;
+	else {
+		d1 = maxdepth(root->left) + 1;
+		d2 = maxdepth(root->right) + 1;
+		return d1 > d2 ? d1 : d2;
+	}
 }
 
-void print(struct rb_node *root) {
-  Queue *queue;
-  int mdepth, fullcount, count;
-  struct rb_node *node;
+void print(struct rb_node *root)
+{
+	Queue *queue;
+	int mdepth, fullcount, count;
+	struct rb_node *node;
 
-  queueCreate(&queue);
+	queueCreate(&queue);
 
-  mdepth = maxdepth(root);
-  fullcount = (2 << mdepth) - 1;
+	mdepth = maxdepth(root);
+	fullcount = (2 << mdepth) - 1;
 
-  count = 0;
+	count = 0;
 
-  enqueue(&queue, root);
+	enqueue(&queue, root);
 
-  while (!queueEmpty(&queue)) {
-    dequeue(&queue, &node);
+	while (!queueEmpty(&queue)) {
+		dequeue(&queue, &node);
 
-    count++;
+		count++;
 
-    if (!node) {
-      if (count <= fullcount)
-        printf(",nil");
-    } else {
-      if (count > 1)
-        printf(",");
+		if (!node) {
+			if (count <= fullcount)
+				printf(",nil");
+		} else {
+			if (count > 1)
+				printf(",");
 
-      printf("%d%c", node->val, node->color ? 'b' : 'r');
+			printf("%d%c", node->val, node->color ? 'b' : 'r');
 
-      enqueue(&queue, node->left);
-      enqueue(&queue, node->right);
-    }
+			enqueue(&queue, node->left);
+			enqueue(&queue, node->right);
+		}
 
-    if (queueEmpty(&queue))
-      printf("\n");
-  }
+		if (queueEmpty(&queue))
+			printf("\n");
+	}
 }
 
-int main() {
-  struct rb_node *root = NULL;
-  root = insert(root, 5);
-  // print(root);
-  root = insert(root, 7);
-  // print(root);
-  root = insert(root, 3);
-  // print(root);
-  root = insert(root, 2);
-  root = insert(root, 10);
-  root = insert(root, 15);
-  root = insert(root, 9);
-  root = insert(root, 8);
-  print(root);
-  root = insert(root, 6);
-  print(root);
-  /*
+int main()
+{
+	struct rb_node *root = NULL;
+	root = insert(root, 5);
+	// print(root);
+	root = insert(root, 7);
+	// print(root);
+	root = insert(root, 3);
+	// print(root);
+	root = insert(root, 2);
+	root = insert(root, 10);
+	root = insert(root, 15);
+	root = insert(root, 9);
+	root = insert(root, 8);
+	print(root);
+	root = insert(root, 6);
+	print(root);
+	/*
   root = insert(root, 11);
   print(root);
   root = insert(root, 12);
@@ -892,7 +924,7 @@ int main() {
   print(root);
    */
 
-  /*
+	/*
   printf("next of -1: %d\n", next(root, -1)->val);
   printf("next of 0: %d\n", next(root, 0)->val);
   printf("next of 2: %d\n", next(root, 2)->val);
@@ -900,4 +932,3 @@ int main() {
   printf("next of 6: %d\n", next(root, 6)->val);
   */
 }
-
