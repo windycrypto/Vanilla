@@ -66,8 +66,11 @@ ForEachMacros:
   - foreach
   - Q_FOREACH
   - BOOST_FOREACH
-IncludeBlocks:   Regroup
+#IncludeBlocks:   Regroup
 IncludeCategories:
+  - Regex:           '^".*\.h"'
+    Priority:        3
+    SortPriority:    0
   - Regex:           '^<ext/.*\.h>'
     Priority:        2
     SortPriority:    0

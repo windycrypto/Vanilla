@@ -1,12 +1,10 @@
-#include "include/rbtree.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "include/rbtree.h"
+
 /*
- * left rotation is also counter clockwise rotation
- *
- * \return new root
+ * left rotation is counter clockwise rotation
  */
 static inline struct rb_node *_rotate_left(struct rb_node *n) {
   struct rb_node *tmp = n->right;
@@ -16,9 +14,7 @@ static inline struct rb_node *_rotate_left(struct rb_node *n) {
 }
 
 /*
- * right rotation is also clockwise rotation
- *
- * \return new root
+ * right rotation is clockwise rotation
  */
 static inline struct rb_node *_rotate_right(struct rb_node *n) {
   struct rb_node *tmp = n->left;
@@ -39,9 +35,9 @@ static inline struct rb_node *_new_rb_node(int val) {
 }
 
 /*
- * \return the new root
+ * return the new root
  */
-struct rb_node *insert(struct rb_node *root, int val) {
+struct rb_node *rb_insert(struct rb_node *root, int val) {
   // inserting into an empty rbtree
   if (!root) {
     root = _new_rb_node(val);
@@ -186,18 +182,18 @@ done_first_node:
   return root;
 }
 
-struct rb_node *find(struct rb_node *root, int val) {
+struct rb_node *rb_find(struct rb_node *root, int val) {
   if (!root)
     return NULL;
   else if (root->val > val)
-    return find(root->left, val);
+    return rb_find(root->left, val);
   else if (root->val < val)
-    return find(root->right, val);
+    return rb_find(root->right, val);
   else
     return root;
 }
 
-struct rb_node *delete (struct rb_node *root, int val) {
+struct rb_node *rb_remove(struct rb_node *root, int val) {
   if (!root) return root;
 
   // go down to find the target node, meanwhile do top-down correlation
@@ -344,34 +340,4 @@ struct rb_node *delete (struct rb_node *root, int val) {
   // NOTE normally we will never reach here
 
   return root;
-}
-
-extern void rbtree_dump(struct rb_node *);
-
-// compile with `clang rbtree.c queue.c util.c`
-int main() {
-  struct rb_node *root = NULL;
-  root = insert(root, 9);
-  root = insert(root, 10);
-  root = insert(root, 18);
-  root = insert(root, 20);
-  root = insert(root, 21);
-  root = insert(root, 22);
-  root = insert(root, 24);
-  root = insert(root, 25);
-  root = insert(root, 26);
-  root = insert(root, 30);
-  root = insert(root, 31);
-  root = insert(root, 35);
-  root = insert(root, 36);
-  root = insert(root, 40);
-  root = insert(root, 45);
-  root = insert(root, 55);
-  root = insert(root, 55);
-  root = insert(root, 65);
-  root = insert(root, 75);
-  rbtree_dump(root);
-
-  root = delete (root, 25);
-  rbtree_dump(root);
 }
