@@ -22,7 +22,7 @@ int rbtree_depth(struct rb_node *root) {
  * balanced tree. Printing unbalanced tree may end up with printing excessive
  * "nil"s
  */
-void rbtree_dump(struct rb_node *root) {
+void rb_dump(struct rb_node *root) {
   int mdepth, fullcount, count = 0;
 
   queue_t *queue = create_queue(free);
@@ -98,38 +98,27 @@ int rb_valid(struct rb_node *root) {
 
 // compile with `clang rbtree.c queue.c util.c`
 int main() {
-  struct rb_node *root = NULL;
-  assert(rb_valid(root));
-  root = rb_insert(root, 9);
-  assert(rb_valid(root));
-  root = rb_insert(root, 10);
-  assert(rb_valid(root));
-  root = rb_insert(root, 18);
-  assert(rb_valid(root));
-  root = rb_insert(root, 20);
-  assert(rb_valid(root));
-  root = rb_insert(root, 21);
-  assert(rb_valid(root));
-  root = rb_insert(root, 22);
-  assert(rb_valid(root));
-  root = rb_insert(root, 24);
-  assert(rb_valid(root));
-  root = rb_insert(root, 25);
-  assert(rb_valid(root));
-  root = rb_insert(root, 26);
-  assert(rb_valid(root));
-  root = rb_insert(root, 30);
-  assert(rb_valid(root));
-  root = rb_insert(root, 31);
-  root = rb_insert(root, 35);
-  root = rb_insert(root, 36);
-  root = rb_insert(root, 40);
-  root = rb_insert(root, 45);
-  root = rb_insert(root, 55);
-  root = rb_insert(root, 55);
-  root = rb_insert(root, 65);
-  root = rb_insert(root, 75);
+  int test_data[] = {
+      9,  30, 50, 1,  12, 60, 28, 99, 101, 34,  55,
+      14, 19, 87, 49, 33, 28, 65, 70, 9,   110,
+  };
 
-  root = rb_remove(root, 25);
-  assert(rb_valid(root));
+  struct rb_node *root = NULL;
+
+  // test inserting
+  for (int i = 0; i < sizeof test_data / sizeof test_data[0]; i++) {
+    root = rb_insert(root, test_data[i]);
+    rb_dump(root);
+    assert(rb_valid(root));
+    assert(rb_find(root, test_data[i]));
+  }
+
+  // test deleting
+  for (int i = 0; i < sizeof test_data / sizeof test_data[0]; i++) {
+    printf("deleting %d\n", test_data[i]);
+    root = rb_remove(root, test_data[i]);
+    rb_dump(root);
+    assert(rb_valid(root));
+    assert(!rb_find(root, test_data[i]));
+  }
 }
