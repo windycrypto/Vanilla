@@ -1,8 +1,8 @@
-#include "include/skip-list.h"
-
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "include/skiplist.h"
 
 /* An implementation of the
  * "Skip Lists: A Probabilistic Alternative to Balanced Trees" written by

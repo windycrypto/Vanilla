@@ -1,4 +1,4 @@
-#include "include/binary-heap.h"
+#include "include/bheap.h"
 
 #include <limits.h>
 #include <stdio.h>
