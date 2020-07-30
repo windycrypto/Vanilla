@@ -1,17 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct TreeNode {
-  int val;
-  int height;
-  struct TreeNode *left;
-  struct TreeNode *right;
-};
+#include "include/avltree.h"
+
+/*
+ * AVL tree height version
+ */
 
 /*
  * Get height of node
  */
-static inline int _h(struct TreeNode *node) { return node ? node->height : -1; }
+static inline int _h(struct avl_node *node) { return node ? node->height : -1; }
 
 /*
  * Caculate height of node, this function will update node's height
@@ -20,7 +19,7 @@ static inline int _h(struct TreeNode *node) { return node ? node->height : -1; }
  *
  * \return new height
  */
-int height(struct TreeNode *root) {
+int height(struct avl_node *root) {
   int h1, h2;
 
   h1 = _h(root->left);
@@ -34,8 +33,8 @@ int height(struct TreeNode *root) {
 /*
  * \return new root
  */
-struct TreeNode *rotate(struct TreeNode *root, int dir) {
-  struct TreeNode *tmp;
+struct avl_node *rotate(struct avl_node *root, int dir) {
+  struct avl_node *tmp;
 
   /* dir != 0, clockwise */
   if (dir) {
@@ -62,13 +61,13 @@ struct TreeNode *rotate(struct TreeNode *root, int dir) {
  *
  * Other cases can be deduced in the same way
  */
-struct TreeNode *insert(struct TreeNode *root, int val) {
+struct avl_node *avl_insert(struct avl_node *root, int val) {
   if (!root) {
     root = malloc(sizeof *root);
     root->val = val;
     root->left = root->right = NULL;
   } else if (root->val > val) {
-    root->left = insert(root->left, val);
+    root->left = avl_insert(root->left, val);
 
     if (_h(root->left) - _h(root->right) > 1) {
       if (root->left->val > val) {
@@ -79,7 +78,7 @@ struct TreeNode *insert(struct TreeNode *root, int val) {
       }
     }
   } else if (root->val < val) {
-    root->right = insert(root->right, val);
+    root->right = avl_insert(root->right, val);
 
     if (_h(root->left) - _h(root->right) < -1) {
       if (root->right->val < val) {
@@ -96,24 +95,24 @@ struct TreeNode *insert(struct TreeNode *root, int val) {
   return root;
 }
 
-struct TreeNode *find(struct TreeNode *root, int val) {
+struct avl_node *avl_find(struct avl_node *root, int val) {
   if (!root)
     return NULL;
   else if (root->val > val)
-    return find(root->left, val);
+    return avl_find(root->left, val);
   else if (root->val < val)
-    return find(root->right, val);
+    return avl_find(root->right, val);
   else
     return root;
 }
 
-struct TreeNode *delete (struct TreeNode *root, int val) {
-  struct TreeNode *tmp;
+struct avl_node *avl_remove(struct avl_node *root, int val) {
+  struct avl_node *tmp;
 
   if (!root)
     ;
   else if (root->val > val) {
-    root->left = delete (root->left, val);
+    root->left = avl_remove(root->left, val);
     if (_h(root->left) - _h(root->right) < -1) {
       if (_h(root->right) - _h(root->right->right) == 1) {
         root = rotate(root, 0);
@@ -124,12 +123,12 @@ struct TreeNode *delete (struct TreeNode *root, int val) {
     }
   } else if (root->val < val || (root->left && root->right)) {
     if (root->val < val) {
-      root->right = delete (root->right, val);
+      root->right = avl_remove(root->right, val);
     } else {
       tmp = root->right;
       while (tmp->left) tmp = tmp->left;
       root->val = tmp->val;
-      root->right = delete (root->right, root->val);
+      root->right = avl_remove(root->right, root->val);
     }
 
     if (_h(root->left) - _h(root->right) > 1) {
@@ -154,5 +153,3 @@ struct TreeNode *delete (struct TreeNode *root, int val) {
 
   return root;
 }
-
-int main() {}
