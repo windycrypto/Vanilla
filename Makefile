@@ -11,3 +11,7 @@ avltree-test:
 avltree2-test:
 	clang tests/avltree2.c queue.c avltree2.c -I. -o /tmp/avltree2-test
 	/tmp/avltree2-test
+
+skiplist-test:
+	clang tests/skiplist.c skiplist.c -I. -o /tmp/skiplist-test
+	/tmp/skiplist-test

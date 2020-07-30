@@ -99,8 +99,7 @@ int rb_valid(struct rb_node *root) {
 // compile with `clang rbtree.c queue.c util.c`
 int main() {
   int test_data[] = {
-      9,  30, 50, 1,  12, 60, 28, 99, 101, 34,  55,
-      14, 19, 87, 49, 33, 28, 65, 70, 9,   110,
+#include "numbers.txt"
   };
 
   struct rb_node *root = NULL;
@@ -108,14 +107,24 @@ int main() {
   // test inserting
   for (int i = 0; i < sizeof test_data / sizeof test_data[0]; i++) {
     root = rb_insert(root, test_data[i]);
-    assert(rb_valid(root));
+    /*
+    if (i % 1000 == 0) {
+      assert(rb_valid(root));
+    }
+    */
     assert(rb_find(root, test_data[i]));
   }
 
   // test deleting
   for (int i = 0; i < sizeof test_data / sizeof test_data[0]; i++) {
+    // printf("deleting %d\n", test_data[i]);
     root = rb_remove(root, test_data[i]);
-    assert(rb_valid(root));
+    // rb_dump(root);
+    /*
+    if (i % 1000 == 0) {
+      assert(rb_valid(root));
+    }
+    */
     assert(!rb_find(root, test_data[i]));
   }
   printf("success!\n");

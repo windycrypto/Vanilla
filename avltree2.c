@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "avltree2.h"
+#include "include/avltree2.h"
 
 /*
  * AVL tree balance factor version

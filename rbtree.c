@@ -17,6 +17,7 @@
       GP->left = nr;                               \
     else                                           \
       GP->right = nr;                              \
+    GP = nr;                                       \
   } while (0)
 
 #define rb_single_left_rotate() \

@@ -30,7 +30,7 @@ struct skip_list *skip_list_new(/* parameter: max value of the key type */) {
   return list;
 }
 
-void insert(struct skip_list *list, int key) {
+void skip_list_insert(struct skip_list *list, int key) {
   struct skip_list_node *n = &list->head,  // a cursor used to traverse the list
       *prev[SKIP_LIST_MAX_LEVEL] = {NULL};  // stores n's previous nodes
   int lvl;
@@ -67,7 +67,7 @@ void insert(struct skip_list *list, int key) {
   } while (lvl < SKIP_LIST_MAX_LEVEL);
 }
 
-void delete (struct skip_list *list, int key) {
+void skip_list_remove(struct skip_list *list, int key) {
   struct skip_list_node *n = &list->head,  // a cursor used to traverse the list
       *prev[SKIP_LIST_MAX_LEVEL] = {&list->head},  // stores n's previous nodes
           *target = NULL;
@@ -98,50 +98,28 @@ void delete (struct skip_list *list, int key) {
   if (target) free(target);
 }
 
-/* delimiter */
-
-void skip_list_dump(struct skip_list *list) {
-  printf("skip list:\n");
+struct skip_list_node *skip_list_find(struct skip_list *list, int key) {
+  struct skip_list_node *n = &list->head,  // a cursor used to traverse the list
+      *prev = NULL,                        // stores n's previous nodes
+          *target = NULL;
 
   int lvl = SKIP_LIST_MAX_LEVEL - 1;
+
+  // list should not be NULL if the user create the skip list using
+  // `skip_list_new`
+  if (!list) abort();
+
   while (lvl >= 0) {
-    struct skip_list_node *n = list->head.next[lvl];
-
-    printf("level %d: ", lvl);
-    while (n != &list->tail && n->next[lvl]) {
-      if (n->next[lvl] == &list->tail)
-        printf("%d", n->key);
-      else
-        printf("%d->", n->key);
+    if (n->key == key) {
+      target = n;
+      break;
+    } else if (n->key < key) {
+      prev = n;
       n = n->next[lvl];
+    } else {
+      n = prev;
+      lvl--;
     }
-    printf("\n");
-
-    lvl--;
   }
-}
-
-int main() {
-  struct skip_list *list = skip_list_new();
-  insert(list, 1);
-  insert(list, 5);
-  insert(list, 10);
-  insert(list, 15);
-  insert(list, 20);
-  insert(list, 3);
-  insert(list, 36);
-  insert(list, 16);
-  insert(list, 160);
-  insert(list, 130);
-  insert(list, 135);
-  insert(list, 230);
-  insert(list, 530);
-  insert(list, 234);
-  insert(list, 720);
-  insert(list, 150);
-  insert(list, 190);
-  insert(list, 133);
-  insert(list, 30);
-  delete (list, 135);
-  skip_list_dump(list);
+  return target;
 }
