@@ -1,18 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct TreeNode {
-  int val;
-  int factor;
-  struct TreeNode *left;
-  struct TreeNode *right;
-};
+#include "avltree2.h"
+
+/*
+ * AVL tree balance factor version
+ */
 
 /*
  * \return new root
  */
-struct TreeNode *rotate(struct TreeNode *root, int dir) {
-  struct TreeNode *tmp;
+struct avl2_node *rotate(struct avl2_node *root, int dir) {
+  struct avl2_node *tmp;
 
   /* dir != 0, clockwise */
   if (dir) {
@@ -33,13 +32,14 @@ struct TreeNode *rotate(struct TreeNode *root, int dir) {
 
 /*
  * if left subtree's height is 1 more greater than right subtree, and
- * the root's val of left subtree greater than inserted val, then unbalanced
- * condition caused by new node inserted into left subtree's left child
+ * the root's val of left subtree greater than inserted val, then
+ * unbalanced condition caused by new node inserted into left subtree's
+ * left child
  *
  * Other cases can be deduced in the same way
  */
-struct TreeNode *insert(struct TreeNode *root, int val) {
-  struct TreeNode *tmp;
+struct avl2_node *avl2_insert(struct avl2_node *root, int val) {
+  struct avl2_node *tmp;
   int h1, h2;
 
   if (!root) {
@@ -50,7 +50,7 @@ struct TreeNode *insert(struct TreeNode *root, int val) {
   } else if (root->val > val) {
     tmp = root->left;
     h1 = tmp ? tmp->factor : -1;
-    root->left = insert(root->left, val);
+    root->left = avl2_insert(root->left, val);
     h2 = root->left->factor;
 
     if (!tmp || (root->left == tmp && h2 && h2 != h1)) {
@@ -82,7 +82,7 @@ struct TreeNode *insert(struct TreeNode *root, int val) {
   } else if (root->val < val) {
     tmp = root->right;
     h1 = tmp ? tmp->factor : -1;
-    root->right = insert(root->right, val);
+    root->right = avl2_insert(root->right, val);
     h2 = root->right->factor;
 
     if (!tmp || (tmp == root->right && h2 && h2 != h1)) {
@@ -116,19 +116,19 @@ done:
   return root;
 }
 
-struct TreeNode *find(struct TreeNode *root, int val) {
+struct avl2_node *avl2_find(struct avl2_node *root, int val) {
   if (!root)
     return NULL;
   else if (root->val > val)
-    return find(root->left, val);
+    return avl2_find(root->left, val);
   else if (root->val < val)
-    return find(root->right, val);
+    return avl2_find(root->right, val);
   else
     return root;
 }
 
-struct TreeNode *delete (struct TreeNode *root, int val) {
-  struct TreeNode *tmp;
+struct avl2_node *avl2_remove(struct avl2_node *root, int val) {
+  struct avl2_node *tmp;
   int h1, h2, flag;
 
   if (!root)
@@ -137,7 +137,7 @@ struct TreeNode *delete (struct TreeNode *root, int val) {
     if (root->left) {
       tmp = root->left;
       h1 = root->left->factor;
-      root->left = delete (root->left, val);
+      root->left = avl2_remove(root->left, val);
       if (root->left) h2 = root->left->factor;
 
       /* single child, (note, double child case has been converted to
@@ -189,7 +189,7 @@ struct TreeNode *delete (struct TreeNode *root, int val) {
       if (root->val < val) {
         tmp = root->right;
         h1 = tmp->factor;
-        root->right = delete (root->right, val);
+        root->right = avl2_remove(root->right, val);
         if (root->right) h2 = root->right->factor;
 
       } else {
@@ -200,7 +200,7 @@ struct TreeNode *delete (struct TreeNode *root, int val) {
         root->val = tmp->val;
 
         tmp = root->right;
-        root->right = delete (root->right, root->val);
+        root->right = avl2_remove(root->right, root->val);
         if (root->right) h2 = root->right->factor;
       }
 
@@ -252,5 +252,3 @@ struct TreeNode *delete (struct TreeNode *root, int val) {
 
   return root;
 }
-
-int main() {}
