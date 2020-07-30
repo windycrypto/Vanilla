@@ -160,17 +160,6 @@ struct rb_node *rb_insert(struct rb_node *root, int val) {
   // if uncle is black, do rotation and color flipping
   // refer to the *Figure 12.10* of *Data Structures and Algorithm Analysis in
   // C*
-  //
-  //
-  /*
-   * Case - inserting node's uncle is black
-   *
-   *         G(b)      G(b)      G            G
-   *        /         /           \            \
-   *       P(r)  or  P(r)   or     P     or     P
-   *      /           \             \          /
-   *     n(r)          n(r)           new      new
-   */
   if (rb_node_black(GP->left)) {
     /*
      * Case - inserting node's uncle is black

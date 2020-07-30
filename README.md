@@ -2,5 +2,5 @@ Vanilla C implementations of various data structures
 
 ### TODOs
 
-* [ ] visualization with the help of webassembly
+* [ ] stress test on these impelementations and compare them with C++ STL and golang std lib
 * [ ] k-d tree and splay tree
